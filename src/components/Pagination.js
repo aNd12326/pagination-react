@@ -1,16 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./styles.css";
-
-const renderData = (data) => {
-  return (
-    <ul>
-      {data.map((todo) => {
-        return <li key={todo.id}>{todo.title}</li>;
-      })}
-    </ul>
-  );
-};
+import renderData from "../helpers/renderData";
 
 export default function Pagination() {
   const [data, setData] = useState([]);
@@ -32,6 +23,7 @@ export default function Pagination() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
 
+  //renderizar numeros de paginas
   const renderPageNumbers = pages.map((number) => {
     return (
       <li
