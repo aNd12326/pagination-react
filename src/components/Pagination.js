@@ -8,7 +8,11 @@ export default function Pagination() {
 
   // para el paginado es esto
   const [currentePage, setCurrentePage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
+  const [pageNumberLimit, setPageNumberLimit] = useState(5);
+  const [maxPageNumberLimit, setMaxPageNumberLimit] = useState(5);
+  const [minPageNumberLimit, setMinPageNumberLimit] = useState(0);
 
   const handleClick = (e) => {
     setCurrentePage(Number(e.target.id));
@@ -25,16 +29,20 @@ export default function Pagination() {
 
   //renderizar numeros de paginas
   const renderPageNumbers = pages.map((number) => {
-    return (
-      <li
-        key={number}
-        id={number}
-        onClick={handleClick}
-        className={currentePage == number ? "active" : null}
-      >
-        {number}
-      </li>
-    );
+    if (number < maxPageNumberLimit + 1 && number > minPageNumberLimit) {
+      return (
+        <li
+          key={number}
+          id={number}
+          onClick={handleClick}
+          className={currentePage == number ? "active" : null}
+        >
+          {number}
+        </li>
+      );
+    } else {
+      return null;
+    }
   });
 
   const fetchApi = async () => {
@@ -49,11 +57,45 @@ export default function Pagination() {
     fetchApi();
   }, []);
 
+  const handleNextBtn = () => {
+    setCurrentePage(currentePage + 1);
+    if (currentePage + 1 > maxPageNumberLimit) {
+      setMaxPageNumberLimit(maxPageNumberLimit + pageNumberLimit);
+      setMinPageNumberLimit(minPageNumberLimit + pageNumberLimit);
+    }
+  };
+
+  const handlePrevBtn = () => {
+    setCurrentePage(currentePage - 1);
+    if ((currentePage - 1) % pageNumberLimit == 0) {
+      setMaxPageNumberLimit(maxPageNumberLimit - pageNumberLimit);
+      setMinPageNumberLimit(minPageNumberLimit - pageNumberLimit);
+    }
+  };
+
   return (
     <>
       <div>Todo List</div>
-      <ul className="pageNumbers">{renderPageNumbers}</ul>
       {renderData(currentItems)}
+      <ul className="pageNumbers">
+        <li>
+          <button
+            disabled={currentePage == pages[0] ? true : false}
+            onClick={handlePrevBtn}
+          >
+            Prev
+          </button>
+        </li>
+        {renderPageNumbers}
+        <li>
+          <button
+            disabled={currentePage == pages[pages.length - 1] ? true : false}
+            onClick={handleNextBtn}
+          >
+            Next
+          </button>
+        </li>
+      </ul>
     </>
   );
 }
